@@ -2,21 +2,32 @@ package com.webApp.ecommerce.Controller;
 import com.webApp.ecommerce.Payloads.AppConstants;
 import com.webApp.ecommerce.Payloads.ProductDto;
 import com.webApp.ecommerce.Payloads.ProductResponse;
+import com.webApp.ecommerce.Services.FileService;
 import com.webApp.ecommerce.Services.ProductService;
 import jakarta.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/product/")
 public class ProductController {
 
-    private ProductService productService;
-    public ProductController(ProductService productService) {
+    private final ProductService productService;
+    private final FileService fileService;
+    
+    @Value("${project.image}")
+    private String path;
+    
+    public ProductController(ProductService productService, FileService fileService) {
         this.productService = productService;
+        this.fileService = fileService;
     }
 
     @PostMapping("/user/{userId}/category/{categoryId}/")
@@ -46,6 +57,16 @@ public class ProductController {
     ) {
         ProductResponse productResponse = this.productService.getAllProduct(pageNumber,pageSize,sortBy,sortDir);
         return new ResponseEntity<>(productResponse,HttpStatus.OK);
+    }
+    
+    @PostMapping("/image/upload/{productId}")
+    public ResponseEntity<ProductDto> uploadImage(@RequestParam MultipartFile photo, @PathVariable Integer productId)
+    throws IOException{
+    	ProductDto productDto = this.productService.getProductById(productId);
+    	String fileName = this.fileService.uploadFile(path, photo);
+        productDto.setImageName(fileName);
+        ProductDto updateProduct = this.productService.updateProduct(productDto,productId);
+        return new ResponseEntity<>(updateProduct,HttpStatus.OK);
     }
 
     @GetMapping("/category/{categoryId}")
