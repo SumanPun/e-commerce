@@ -5,7 +5,6 @@ import com.webApp.ecommerce.Payloads.ProductResponse;
 import com.webApp.ecommerce.Services.FileService;
 import com.webApp.ecommerce.Services.ProductService;
 import jakarta.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,9 +29,9 @@ public class ProductController {
         this.fileService = fileService;
     }
 
-    @PostMapping("/user/{userId}/category/{categoryId}/")
-    public ResponseEntity<ProductDto> createProduct(@Valid @RequestBody ProductDto productDto, @PathVariable Integer userId,@PathVariable Integer categoryId) {
-        ProductDto saveProduct = this.productService.createProduct(productDto,userId,categoryId);
+    @PostMapping("/category/{categoryId}/")
+    public ResponseEntity<ProductDto> createProduct(@Valid @RequestBody ProductDto productDto,@PathVariable Integer categoryId) {
+        ProductDto saveProduct = this.productService.createProduct(productDto,categoryId);
         return new ResponseEntity<>(saveProduct, HttpStatus.CREATED);
     }
 
@@ -74,11 +73,11 @@ public class ProductController {
         List<ProductDto> productDtos = this.productService.findByCategory(categoryId);
         return new ResponseEntity<>(productDtos,HttpStatus.OK);
     }
-    @GetMapping("/user/{userId}")
+   /* @GetMapping("/user/{userId}")
     public ResponseEntity<List<ProductDto>> findByUser(@PathVariable int userId) {
         List<ProductDto> productDtos = this.productService.findByUser(userId);
         return new ResponseEntity<>(productDtos,HttpStatus.OK);
-    }
+    } */
 
     @DeleteMapping("/{productId}/")
     public ResponseEntity<ProductDto> deleteProduct(@PathVariable int productId) {

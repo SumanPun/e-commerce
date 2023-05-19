@@ -4,6 +4,7 @@ import com.webApp.ecommerce.Exceptions.ResourceNotFoundException;
 import com.webApp.ecommerce.Model.Category;
 import com.webApp.ecommerce.Payloads.CategoryDto;
 import com.webApp.ecommerce.Repositories.CategoryRepository;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 

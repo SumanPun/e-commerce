@@ -11,6 +11,7 @@ import com.webApp.ecommerce.Payloads.UserDto;
 import com.webApp.ecommerce.Repositories.CategoryRepository;
 import com.webApp.ecommerce.Repositories.ProductRepository;
 import com.webApp.ecommerce.Repositories.UserRepository;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class ProductService {
 
     private final ProductRepository productRepository;
@@ -37,7 +39,7 @@ public class ProductService {
     }
 
     public Product dtoToProduct(ProductDto productDto) {
-        Product product = new Product();
+      /*  Product product = new Product();
         product.setProductId(productDto.getProductId());
         product.setProductName(productDto.getProductName());
         product.setProductDescription(productDto.getProductDescription());
@@ -46,13 +48,14 @@ public class ProductService {
         product.setStock(productDto.getStock());
         product.setQuantity(productDto.getQuantity());
         product.setImageName(productDto.getImageName());
+        //System.out.println("error" + productDto.getCategoryDto().getTitle());
 
         Category category = new Category();
         category.setCategoryId(product.getCategory().getCategoryId());
-        category.setTitle(product.getCategory().getTitle()); 
+        category.setTitle(product.getCategory().getTitle());
         product.setCategory(category);
-        return product;
-        //return this.modelMapper.map(productDto,Product.class);
+        return product; */
+        return this.modelMapper.map(productDto,Product.class);
     }
 
     public ProductDto productToDto(Product product) {
@@ -72,18 +75,18 @@ public class ProductService {
         categoryDto.setTitle(product.getCategory().getTitle());
         productDto.setCategoryDto(categoryDto);
 
-        UserDto userDto = new UserDto();
+     /*   UserDto userDto = new UserDto();
         userDto.setFirstName(product.getUser().getFirstName());
         userDto.setLastName(product.getUser().getLastName());
         userDto.setEmail(product.getUser().getEmail());
-        userDto.setPassWord(product.getUser().getPassWord());
+        userDto.setPassWord(product.getUser().getPassword());
         userDto.setAddress(product.getUser().getAddress());
         userDto.setGender(product.getUser().getGender());
         userDto.setUserId(product.getUser().getUserId());
         userDto.setPhoneNo(product.getUser().getPhoneNo());
         userDto.setAddedDate(product.getUser().getAddedDate());
         userDto.setActive(product.getUser().getActive());
-        productDto.setUserDto(userDto); 
+        productDto.setUserDto(userDto); */
 
 
         return productDto;
@@ -91,21 +94,17 @@ public class ProductService {
        // return this.modelMapper.map(product,ProductDto.class);
     }
 
-    public UserRepository getUserRepository() {
-		return userRepository;
-	}
-
-	public ProductDto createProduct(ProductDto productDto, Integer userId, Integer categoryId) {
+	public ProductDto createProduct(ProductDto productDto, Integer categoryId) {
         Category category = this.categoryRepository.findById(categoryId).orElseThrow(()-> new ResourceNotFoundException("category","categoryId",categoryId));
-        User user = this.userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("user","userId",userId));
+      //  User user = this.userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("user","userId",userId));
         Product product = this.dtoToProduct(productDto);
        //System.out.println("category "+ category.getCategoryId());
         product.setCategory(category);
-        product.setUser(user);
+        //product.setUser(user);
         System.out.println("user " + product.getCategory().getTitle());
         Product saveProduct = this.productRepository.save(product);
-        return this.modelMapper.map(saveProduct, ProductDto.class);
-       // return productToDto(saveProduct);
+      //  return this.modelMapper.map(saveProduct, ProductDto.class);
+        return productToDto(saveProduct);
     }
 
     public ProductDto updateProduct(ProductDto productDto, Integer productId) {
@@ -158,12 +157,12 @@ public class ProductService {
        return productDos;
     }
 
-    public List<ProductDto> findByUser(Integer userId) {
+  /*  public List<ProductDto> findByUser(Integer userId) {
         User user = this.userRepository.findById(userId).orElseThrow(()->new ResourceNotFoundException("user","userId",userId));
         List<Product> productList = this.productRepository.findByUser(user);
         List<ProductDto> productDos = productList.stream().map(this::productToDto).collect(Collectors.toList());
         return  productDos;
-    }
+    } */
 
     public ProductDto deleteProduct(Integer productId) {
         Product product = this.productRepository.findById(productId).orElseThrow(()-> new ResourceNotFoundException("Product","productID",productId));

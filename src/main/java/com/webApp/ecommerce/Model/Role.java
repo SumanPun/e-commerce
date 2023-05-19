@@ -1,11 +1,14 @@
 package com.webApp.ecommerce.Model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import jakarta.transaction.Transactional;
+import lombok.*;
 
 @Entity
 @Table(name = "role")
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

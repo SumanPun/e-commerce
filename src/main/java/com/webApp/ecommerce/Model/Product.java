@@ -1,6 +1,9 @@
 package com.webApp.ecommerce.Model;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name = "products")
@@ -21,9 +24,9 @@ public class Product {
     @JoinColumn(name = "categoryId")
     private Category category;
 
-    @ManyToOne
+   /* @ManyToOne
     @JoinColumn(name = "userId")
-    private User user;
+    private User user; */
 
 
 }

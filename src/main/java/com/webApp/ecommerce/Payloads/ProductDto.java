@@ -29,6 +29,6 @@ public class ProductDto {
     @Size(min = 4,max = 100,message = "Please enter between 4 and 100 character")
     private String productDescription;
     private CategoryDto categoryDto;
-    private UserDto userDto;
+  //  private UserDto userDto;
 
 }

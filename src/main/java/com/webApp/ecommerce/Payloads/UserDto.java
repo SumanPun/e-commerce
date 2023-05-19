@@ -4,6 +4,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 public class UserDto {
@@ -27,4 +29,5 @@ public class UserDto {
     private String phoneNo;
     private Date addedDate;
     private Boolean active;
+
 }
