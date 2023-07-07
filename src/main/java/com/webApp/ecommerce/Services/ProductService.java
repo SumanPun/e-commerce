@@ -1,17 +1,12 @@
 package com.webApp.ecommerce.Services;
-
 import com.webApp.ecommerce.Exceptions.ResourceNotFoundException;
 import com.webApp.ecommerce.Model.Category;
 import com.webApp.ecommerce.Model.Product;
-import com.webApp.ecommerce.Model.User;
 import com.webApp.ecommerce.Payloads.CategoryDto;
 import com.webApp.ecommerce.Payloads.ProductDto;
 import com.webApp.ecommerce.Payloads.ProductResponse;
-import com.webApp.ecommerce.Payloads.UserDto;
 import com.webApp.ecommerce.Repositories.CategoryRepository;
 import com.webApp.ecommerce.Repositories.ProductRepository;
-import com.webApp.ecommerce.Repositories.UserRepository;
-import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,38 +18,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 public class ProductService {
 
     private final ProductRepository productRepository;
     private final ModelMapper modelMapper;
     private final CategoryRepository categoryRepository;
-    private final UserRepository userRepository;
 
-    public ProductService(ProductRepository productRepository, ModelMapper modelMapper, CategoryRepository categoryRepository, UserRepository userRepository) {
+    public ProductService(ProductRepository productRepository, ModelMapper modelMapper, CategoryRepository categoryRepository) {
         this.productRepository=productRepository;
         this.modelMapper=modelMapper;
         this.categoryRepository = categoryRepository;
-        this.userRepository = userRepository;
     }
 
     public Product dtoToProduct(ProductDto productDto) {
-      /*  Product product = new Product();
-        product.setProductId(productDto.getProductId());
-        product.setProductName(productDto.getProductName());
-        product.setProductDescription(productDto.getProductDescription());
-        product.setProductPrice(productDto.getProductPrice());
-        product.setLive(productDto.getLive());
-        product.setStock(productDto.getStock());
-        product.setQuantity(productDto.getQuantity());
-        product.setImageName(productDto.getImageName());
-        //System.out.println("error" + productDto.getCategoryDto().getTitle());
-
-        Category category = new Category();
-        category.setCategoryId(product.getCategory().getCategoryId());
-        category.setTitle(product.getCategory().getTitle());
-        product.setCategory(category);
-        return product; */
         return this.modelMapper.map(productDto,Product.class);
     }
 
@@ -75,35 +51,14 @@ public class ProductService {
         categoryDto.setTitle(product.getCategory().getTitle());
         productDto.setCategoryDto(categoryDto);
 
-     /*   UserDto userDto = new UserDto();
-        userDto.setFirstName(product.getUser().getFirstName());
-        userDto.setLastName(product.getUser().getLastName());
-        userDto.setEmail(product.getUser().getEmail());
-        userDto.setPassWord(product.getUser().getPassword());
-        userDto.setAddress(product.getUser().getAddress());
-        userDto.setGender(product.getUser().getGender());
-        userDto.setUserId(product.getUser().getUserId());
-        userDto.setPhoneNo(product.getUser().getPhoneNo());
-        userDto.setAddedDate(product.getUser().getAddedDate());
-        userDto.setActive(product.getUser().getActive());
-        productDto.setUserDto(userDto); */
-
-
         return productDto;
-
-       // return this.modelMapper.map(product,ProductDto.class);
     }
 
 	public ProductDto createProduct(ProductDto productDto, Integer categoryId) {
         Category category = this.categoryRepository.findById(categoryId).orElseThrow(()-> new ResourceNotFoundException("category","categoryId",categoryId));
-      //  User user = this.userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("user","userId",userId));
         Product product = this.dtoToProduct(productDto);
-       //System.out.println("category "+ category.getCategoryId());
         product.setCategory(category);
-        //product.setUser(user);
-        System.out.println("user " + product.getCategory().getTitle());
         Product saveProduct = this.productRepository.save(product);
-      //  return this.modelMapper.map(saveProduct, ProductDto.class);
         return productToDto(saveProduct);
     }
 
@@ -145,24 +100,15 @@ public class ProductService {
         productResponse.setPageSize(page.getSize());
         productResponse.setTotalPage(page.getTotalPages());
         productResponse.setLastPage(page.isLast());
-       // List<Product> productList = this.productRepository.findAll();
-        //return productList.stream().map(this::productToDto).collect(Collectors.toList());
         return productResponse;
     }
 
     public List<ProductDto> findByCategory(Integer categoryId) {
        Category category = this.categoryRepository.findById(categoryId).orElseThrow(()-> new ResourceNotFoundException("category","categoryID",categoryId));
        List<Product> productList = this.productRepository.findByCategory(category);
-       List<ProductDto> productDos = productList.stream().map(this::productToDto).collect(Collectors.toList());
-       return productDos;
+       List<ProductDto> productCat = productList.stream().map(this::productToDto).collect(Collectors.toList());
+       return productCat;
     }
-
-  /*  public List<ProductDto> findByUser(Integer userId) {
-        User user = this.userRepository.findById(userId).orElseThrow(()->new ResourceNotFoundException("user","userId",userId));
-        List<Product> productList = this.productRepository.findByUser(user);
-        List<ProductDto> productDos = productList.stream().map(this::productToDto).collect(Collectors.toList());
-        return  productDos;
-    } */
 
     public ProductDto deleteProduct(Integer productId) {
         Product product = this.productRepository.findById(productId).orElseThrow(()-> new ResourceNotFoundException("Product","productID",productId));

@@ -1,9 +1,7 @@
 package com.webApp.ecommerce.Model;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.ToString;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,16 +24,9 @@ public class User  implements UserDetails {
     private String gender;
     private String phoneNo;
     @Column(name = "created_at")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Date addedDate;
     private Boolean active;
- //   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-//    List<Product> productList = new ArrayList<>();
-//    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-//    @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user", referencedColumnName = "userId"),
-//            inverseJoinColumns = @JoinColumn(name = "role", referencedColumnName = "roleId"))
-//    @Fetch(FetchMode.JOIN)
-//    private Set<Role> roles = new HashSet<>();
-
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable()
     private Set<Role> roles = new HashSet<>();

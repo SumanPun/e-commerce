@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/product/")
+@RequestMapping("/api/v1/product")
 public class ProductController {
 
     private final ProductService productService;
@@ -73,12 +73,6 @@ public class ProductController {
         List<ProductDto> productDtos = this.productService.findByCategory(categoryId);
         return new ResponseEntity<>(productDtos,HttpStatus.OK);
     }
-   /* @GetMapping("/user/{userId}")
-    public ResponseEntity<List<ProductDto>> findByUser(@PathVariable int userId) {
-        List<ProductDto> productDtos = this.productService.findByUser(userId);
-        return new ResponseEntity<>(productDtos,HttpStatus.OK);
-    } */
-
     @DeleteMapping("/{productId}/")
     public ResponseEntity<ProductDto> deleteProduct(@PathVariable int productId) {
         ProductDto productDto = this.productService.deleteProduct(productId);

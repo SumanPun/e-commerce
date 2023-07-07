@@ -17,5 +17,4 @@ public class CategoryDto {
     @Size(min = 4,max = 20,message = "Please enter between 4 and 20 character")
     private String title;
 
-   // private List<ProductDto> productDtos;
 }

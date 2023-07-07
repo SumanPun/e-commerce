@@ -1,16 +1,11 @@
 package com.webApp.ecommerce.Config;
-
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.webApp.ecommerce.Security.JwtAuthenticationEntryPoint;
+import com.webApp.ecommerce.Security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -18,28 +13,39 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.security.SecureRandom;
 
 @Configuration
-@EnableWebSecurity
+//@EnableWebSecurity
 public class SecurityConfig {
     private final CustomUserDetailService customUserDetailService;
 
-    public SecurityConfig(CustomUserDetailService customUserDetailService ) {
+    private final JwtAuthenticationEntryPoint point;
+    private final JwtAuthenticationFilter filter;
+
+    private static final String[] WHITELIST_PATTERNS = {"/auth/login"};
+
+    public SecurityConfig(CustomUserDetailService customUserDetailService, JwtAuthenticationFilter filter, JwtAuthenticationEntryPoint point ) {
         this.customUserDetailService=customUserDetailService;
+        this.filter = filter;
+        this.point = point;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http.
-                csrf().disable()
-                .authorizeHttpRequests((authorize)-> authorize.anyRequest()
-                        .authenticated())
-                .httpBasic();
-        http.authenticationProvider(daoAuthenticationProvider());
-        DefaultSecurityFilterChain defaultSecurityFilterChain = http.build();
-        return defaultSecurityFilterChain;
+                csrf(csrf->csrf.disable())
+                .authorizeHttpRequests((authorize)-> authorize
+                        .requestMatchers(WHITELIST_PATTERNS).permitAll()
+                        .anyRequest()
+                        .permitAll() //authenticated()
+                )
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(point))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
+        return http.build();
     }
 
     @Bean
@@ -52,11 +58,10 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(10,new SecureRandom("mySalt".getBytes()));
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
-    @Transactional
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception{
         return authenticationConfiguration.getAuthenticationManager();
     }

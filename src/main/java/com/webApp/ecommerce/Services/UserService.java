@@ -1,10 +1,13 @@
 package com.webApp.ecommerce.Services;
 
 import com.webApp.ecommerce.Exceptions.ResourceNotFoundException;
+import com.webApp.ecommerce.Model.Role;
 import com.webApp.ecommerce.Model.User;
 import com.webApp.ecommerce.Payloads.UserDto;
+import com.webApp.ecommerce.Repositories.RoleRepository;
 import com.webApp.ecommerce.Repositories.UserRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
@@ -15,9 +18,14 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
-    public UserService(UserRepository userRepository, ModelMapper modelMapper) {
+
+    private final PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
+    public UserService(UserRepository userRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
+        this.passwordEncoder = passwordEncoder;
+        this.roleRepository = roleRepository;
     }
 
     public User dtoToUser(UserDto userDto) {
@@ -33,6 +41,9 @@ public class UserService {
         User user = this.dtoToUser(userDto);
         user.setAddedDate(new Date());
         user.setActive(true);
+        user.setPassWord(passwordEncoder.encode(userDto.getPassWord()));
+        Role role = this.roleRepository.findById(2).get();
+        user.getRoles().add(role);
         User saveUser = this.userRepository.save(user);
         return this.userToDto(saveUser);
     }
