@@ -1,7 +1,6 @@
 package com.webApp.ecommerce.Model;
 
 import jakarta.persistence.*;
-import jakarta.transaction.Transactional;
 import lombok.*;
 
 @Entity
