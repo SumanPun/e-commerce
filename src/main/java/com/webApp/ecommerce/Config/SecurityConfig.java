@@ -1,6 +1,8 @@
 package com.webApp.ecommerce.Config;
 import com.webApp.ecommerce.Security.JwtAuthenticationEntryPoint;
 import com.webApp.ecommerce.Security.JwtAuthenticationFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +22,7 @@ import java.security.SecureRandom;
 @Configuration
 //@EnableWebSecurity
 public class SecurityConfig {
+
     private final CustomUserDetailService customUserDetailService;
 
     private final JwtAuthenticationEntryPoint point;

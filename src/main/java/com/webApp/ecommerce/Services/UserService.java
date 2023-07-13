@@ -1,5 +1,6 @@
 package com.webApp.ecommerce.Services;
 
+import com.webApp.ecommerce.Config.SecurityConfig;
 import com.webApp.ecommerce.Exceptions.ResourceNotFoundException;
 import com.webApp.ecommerce.Model.Role;
 import com.webApp.ecommerce.Model.User;
@@ -7,6 +8,9 @@ import com.webApp.ecommerce.Payloads.UserDto;
 import com.webApp.ecommerce.Repositories.RoleRepository;
 import com.webApp.ecommerce.Repositories.UserRepository;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.Date;
@@ -15,16 +19,16 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService {
-
+    private static Logger logger= LoggerFactory.getLogger(SecurityConfig.class);
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
-
-    private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private  PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
-    public UserService(UserRepository userRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
+    public UserService(UserRepository userRepository, ModelMapper modelMapper, RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
-        this.passwordEncoder = passwordEncoder;
+//        this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
     }
 
@@ -37,16 +41,28 @@ public class UserService {
     }
 
     public UserDto createUser(UserDto userDto) {
+if(logger.isDebugEnabled()){
 
-        User user = this.dtoToUser(userDto);
-        user.setAddedDate(new Date());
-        user.setActive(true);
-        user.setPassWord(passwordEncoder.encode(userDto.getPassWord()));
-        Role role = this.roleRepository.findById(2).get();
-        user.getRoles().add(role);
-        User saveUser = this.userRepository.save(user);
-        return this.userToDto(saveUser);
-    }
+    logger.debug(UserService.class+"createusers");
+}
+try {
+    User user = this.dtoToUser(userDto);
+    user.setAddedDate(new Date());
+    user.setActive(true);
+    user.setPassWord(passwordEncoder.encode(userDto.getPassWord()));
+    Role role = this.roleRepository.findById(2).get();
+    user.getRoles().add(role);
+    User saveUser = this.userRepository.save(user);
+    return this.userToDto(saveUser);
+}catch(Exception e){
+logger.debug(e.getMessage()+"create user"+UserService.class);
+return null;
+
+}
+
+
+
+}
 
     public UserDto updateUser(UserDto userDto, Integer userId) {
         User user = this.userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("user","userId",userId));

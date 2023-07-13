@@ -79,4 +79,10 @@ public class ProductController {
         return new ResponseEntity<>(productDto,HttpStatus.OK);
     }
 
+    @PutMapping("/{productId}/discount")
+    public ResponseEntity<ProductDto> productAfterDiscount(@PathVariable int productId, @RequestParam double discount) {
+        ProductDto productDto = this.productService.updateProductDiscount(productId,discount);
+        return new ResponseEntity<>(productDto,HttpStatus.OK);
+    }
+
 }

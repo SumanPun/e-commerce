@@ -110,6 +110,13 @@ public class ProductService {
        return productCat;
     }
 
+    public ProductDto updateProductDiscount(Integer id, double discount) {
+        Product product = this.productRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("produt","productId", id));
+        ProductDto productDto = this.productToDto(product);
+        productDto.setProductPrice(product.getProductPrice() - discount/100 * product.getProductPrice());
+        return productDto;
+    }
+
     public ProductDto deleteProduct(Integer productId) {
         Product product = this.productRepository.findById(productId).orElseThrow(()-> new ResourceNotFoundException("Product","productID",productId));
         ProductDto productDto = this.productToDto(product);
