@@ -85,4 +85,11 @@ public class ProductController {
         return new ResponseEntity<>(productDto,HttpStatus.OK);
     }
 
+
+    @GetMapping("/productPromo")
+    public ResponseEntity<Object> applyPromoOnProduct(@RequestParam String promoCode) {
+        Object productDto = this.productService.applyPromoOnProduct(promoCode);
+        return new ResponseEntity<>(productDto, HttpStatus.OK);
+    }
+
 }

@@ -2,11 +2,14 @@ package com.webApp.ecommerce.Services;
 import com.webApp.ecommerce.Exceptions.ResourceNotFoundException;
 import com.webApp.ecommerce.Model.Category;
 import com.webApp.ecommerce.Model.Product;
+import com.webApp.ecommerce.Model.PromoCode;
+import com.webApp.ecommerce.Payloads.ApiResponse;
 import com.webApp.ecommerce.Payloads.CategoryDto;
 import com.webApp.ecommerce.Payloads.ProductDto;
 import com.webApp.ecommerce.Payloads.ProductResponse;
 import com.webApp.ecommerce.Repositories.CategoryRepository;
 import com.webApp.ecommerce.Repositories.ProductRepository;
+import com.webApp.ecommerce.Repositories.PromoCodeRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,11 +26,15 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ModelMapper modelMapper;
     private final CategoryRepository categoryRepository;
+    private final PromoCodeRepository promoCodeRepository;
+    private final PromoCodeService promoCodeService;
 
-    public ProductService(ProductRepository productRepository, ModelMapper modelMapper, CategoryRepository categoryRepository) {
+    public ProductService(ProductRepository productRepository, PromoCodeService promoCodeService ,ModelMapper modelMapper, CategoryRepository categoryRepository, PromoCodeRepository promoCodeRepository) {
         this.productRepository=productRepository;
         this.modelMapper=modelMapper;
         this.categoryRepository = categoryRepository;
+        this.promoCodeRepository = promoCodeRepository;
+        this.promoCodeService = promoCodeService;
     }
 
     public Product dtoToProduct(ProductDto productDto) {
@@ -122,5 +129,25 @@ public class ProductService {
         ProductDto productDto = this.productToDto(product);
         this.productRepository.delete(product);
         return productDto;
+    }
+
+    public Object applyPromoOnProduct(String promocode) {
+        ApiResponse apiResponse = new ApiResponse();
+        PromoCode code = this.promoCodeRepository.findByCode(promocode).orElseThrow(()-> new ResourceNotFoundException("Promocode","code: "+ promocode,0));
+        if(promocode.equalsIgnoreCase(promocode)) {
+                boolean valid = this.promoCodeService.promoCodeValid(promocode);
+                if(!valid) {
+                    apiResponse.setMessage("Invalid PromoCode");
+                    apiResponse.setSuccess(false);
+                    return apiResponse;
+                }
+                int productId = code.getProductId();
+                double produtDiscount = code.getDiscountPercentage();
+                ProductDto product = updateProductDiscount(productId,produtDiscount);
+                return product;
+        }
+        apiResponse.setMessage("PromoCode doesNot match with exiting database");
+        apiResponse.setSuccess(false);
+        return apiResponse;
     }
 }
