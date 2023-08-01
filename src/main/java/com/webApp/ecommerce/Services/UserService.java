@@ -4,6 +4,7 @@ import com.webApp.ecommerce.Config.SecurityConfig;
 import com.webApp.ecommerce.Exceptions.ResourceNotFoundException;
 import com.webApp.ecommerce.Model.Role;
 import com.webApp.ecommerce.Model.User;
+import com.webApp.ecommerce.Model.UserRole;
 import com.webApp.ecommerce.Payloads.UserDto;
 import com.webApp.ecommerce.Repositories.RoleRepository;
 import com.webApp.ecommerce.Repositories.UserRepository;
@@ -13,8 +14,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,7 +33,6 @@ public class UserService {
     public UserService(UserRepository userRepository, ModelMapper modelMapper, RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
-//        this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
     }
 
@@ -47,11 +51,21 @@ if(logger.isDebugEnabled()){
 }
 try {
     User user = this.dtoToUser(userDto);
-    user.setAddedDate(new Date());
+    user.setAddedDate(LocalDateTime.now());
     user.setActive(true);
     user.setPassWord(passwordEncoder.encode(userDto.getPassWord()));
     Role role = this.roleRepository.findById(2).get();
-    user.getRoles().add(role);
+    Set<UserRole> userRoles1 = new HashSet<>();
+    UserRole userRole = new UserRole();
+    userRole.setRole(role);
+    userRole.setUser(user);
+    userRoles1.add(userRole);
+    for(UserRole ur : userRoles1) {
+        this.roleRepository.save(ur.getRole());
+    }
+//    user.getUserRoles().addAll(userRoles);
+    //this.roleRepository.save(userRole.getRole());
+    user.getUserRoles().addAll(userRoles1);
     User saveUser = this.userRepository.save(user);
     return this.userToDto(saveUser);
 }catch(Exception e){
@@ -92,6 +106,11 @@ return null;
         UserDto showUser = this.userToDto(user);
         this.userRepository.delete(user);
         return showUser;
+    }
+
+    public List<Object[]> getUserAndRole() {
+        List<Object[]> objects = this.userRepository.getUserAndRole();
+        return objects;
     }
 
 }

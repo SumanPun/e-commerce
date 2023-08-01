@@ -1,8 +1,11 @@
 package com.webApp.ecommerce.Controller;
 
+import com.webApp.ecommerce.Payloads.UserDto;
 import com.webApp.ecommerce.Security.JwtHelper;
 import com.webApp.ecommerce.Security.JwtRequest;
 import com.webApp.ecommerce.Security.JwtResponse;
+import com.webApp.ecommerce.Services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,13 +25,16 @@ public class AuthController {
     private final AuthenticationManager manager;
     private final JwtHelper helper;
 
+    private final UserService userService;
+
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    public AuthController(UserDetailsService userDetailsService, AuthenticationManager manager, JwtHelper helper) {
+    public AuthController(UserDetailsService userDetailsService, AuthenticationManager manager, JwtHelper helper, UserService userService) {
         this.userDetailsService = userDetailsService;
         this.manager = manager;
         this.helper = helper;
+        this.userService = userService;
     }
 
 
@@ -40,12 +46,19 @@ public class AuthController {
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
         String token = this.helper.generateToken(userDetails);
         String password=userDetails.getPassword();
-String reqPassword= request.getPassword();
-boolean check=passwordEncoder.matches(password,passwordEncoder.encode(reqPassword));
+        String reqPassword= request.getPassword();
+        boolean check=passwordEncoder.matches(password,passwordEncoder.encode(reqPassword));
 
         JwtResponse response = JwtResponse.builder().jwtToken(token)
                 .username(userDetails.getUsername()).build();
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<UserDto> register(@Valid @RequestBody UserDto userDto) {
+
+        UserDto createUserDto = this.userService.createUser(userDto);
+        return new ResponseEntity<>(createUserDto, HttpStatus.CREATED);
     }
 
     private void doAuthenticate(String email, String password) {

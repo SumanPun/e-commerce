@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
@@ -16,5 +17,5 @@ public class PromoCodeDto {
     private String code;
     private int productId;
     private double discountPercentage;
-    private Date expirationDATE;
+    private LocalDateTime expirationDATE;
 }
