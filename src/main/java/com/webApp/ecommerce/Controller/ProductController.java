@@ -84,6 +84,12 @@ public class ProductController {
         return new ResponseEntity<>(productDto,HttpStatus.OK);
     }
 
+    @GetMapping("/search/{keywords}")
+    public ResponseEntity<List<ProductDto>> searchProduct(@PathVariable (name = "keywords") String keywords) {
+        List<ProductDto> list = this.productService.searchProducts("%" + keywords + "%");
+        return new ResponseEntity<>(list,HttpStatus.OK);
+    }
+
     @PutMapping("/{productId}/discount")
     public ResponseEntity<ProductDto> productAfterDiscount(@PathVariable int productId, @RequestParam double discount) {
         ProductDto productDto = this.productService.updateProductDiscount(productId,discount);
