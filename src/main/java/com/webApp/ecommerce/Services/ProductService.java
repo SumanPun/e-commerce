@@ -131,6 +131,12 @@ public class ProductService {
         return productDto;
     }
 
+    public List<ProductDto> searchProducts(String keywords) {
+        List<Product> lists = this.productRepository.searchByKeywords(keywords);
+        List<ProductDto> productLists = lists.stream().map((product) -> this.modelMapper.map(product,ProductDto.class)).collect(Collectors.toList());
+        return productLists;
+    }
+
     public Object applyPromoOnProduct(String promocode) {
         ApiResponse apiResponse = new ApiResponse();
         PromoCode code = this.promoCodeRepository.findByCode(promocode).orElseThrow(()-> new ResourceNotFoundException("Promocode","code: "+ promocode,0));
