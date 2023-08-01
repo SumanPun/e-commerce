@@ -1,8 +1,11 @@
 package com.webApp.ecommerce.Payloads;
 
+import com.webApp.ecommerce.Model.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -27,7 +30,7 @@ public class UserDto {
     private String gender;
     @NotEmpty
     private String phoneNo;
-    private Date addedDate;
+    private LocalDateTime addedDate;
     private Boolean active;
 
 }

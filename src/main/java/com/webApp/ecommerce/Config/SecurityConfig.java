@@ -5,22 +5,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.security.SecureRandom;
 
 @Configuration
-//@EnableWebSecurity
+@EnableGlobalMethodSecurity(
+        prePostEnabled = true)
 public class SecurityConfig {
 
     private final CustomUserDetailService customUserDetailService;
@@ -28,7 +30,7 @@ public class SecurityConfig {
     private final JwtAuthenticationEntryPoint point;
     private final JwtAuthenticationFilter filter;
 
-    private static final String[] WHITELIST_PATTERNS = {"/auth/login"};
+    private static final String[] WHITELIST_PATTERNS = {"/auth/login","/auth/register","/api/v1/product"};
 
     public SecurityConfig(CustomUserDetailService customUserDetailService, JwtAuthenticationFilter filter, JwtAuthenticationEntryPoint point ) {
         this.customUserDetailService=customUserDetailService;
@@ -42,8 +44,9 @@ public class SecurityConfig {
                 csrf(csrf->csrf.disable())
                 .authorizeHttpRequests((authorize)-> authorize
                         .requestMatchers(WHITELIST_PATTERNS).permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/v1/product/**").permitAll()
                         .anyRequest()
-                        .permitAll() //authenticated()
+                        .authenticated()
                 )
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(point))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

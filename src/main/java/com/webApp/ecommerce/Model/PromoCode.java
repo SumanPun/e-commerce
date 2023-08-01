@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -20,5 +21,5 @@ public class PromoCode {
     private double discountPercentage;
     @Column(name = "expired_at")
 //    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = ("yyyy-MM-dd'T'HH:mm:ss.SSSSSS"))
-    private Date expirationDATE;
+    private LocalDateTime expirationDATE;
 }

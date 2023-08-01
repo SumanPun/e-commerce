@@ -7,6 +7,7 @@ import com.webApp.ecommerce.Repositories.PromoCodeRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Random;
 
@@ -34,8 +35,8 @@ public class PromoCodeService {
     }
 
     public PromoCodeDto createPromoCode(PromoCodeDto promoCode) {
-        Date d=new Date();
-        d.setDate((d.getDate())+2);
+        LocalDateTime d = LocalDateTime.now();
+        d.plusDays(2);
         System.out.println(d);
         PromoCode promoCode1 = this.modelMapper.map(promoCode,PromoCode.class);
         promoCode1.setCode(generateRandomCode());
@@ -47,7 +48,7 @@ public class PromoCodeService {
     public boolean promoCodeValid(String code) {
         boolean valid=false;
         PromoCode promoCode = this.promoCodeRepository.findByCode(code).orElseThrow(()-> new ResourceNotFoundException("code","codeName: "+ code,0));
-        Date d = new Date();
+        LocalDateTime d = LocalDateTime.now();
         int compareDates = promoCode.getExpirationDATE().compareTo(d);
 
         if(compareDates > 0 || compareDates == 0) {

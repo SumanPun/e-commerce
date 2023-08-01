@@ -4,6 +4,7 @@ import com.webApp.ecommerce.Payloads.PromoCodeDto;
 import com.webApp.ecommerce.Services.PromoCodeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,6 +18,7 @@ public class PromoCodeController {
     }
 
     @PostMapping("/")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<PromoCodeDto> createPromoCode(@RequestBody PromoCodeDto promoCodeDto) {
         PromoCodeDto promoCodeDto1 = this.promoCodeService.createPromoCode(promoCodeDto);
         return new ResponseEntity<>(promoCodeDto1, HttpStatus.CREATED);

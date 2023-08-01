@@ -5,6 +5,7 @@ import com.webApp.ecommerce.Services.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,12 +21,14 @@ public class CategoryController {
     }
 
     @PostMapping("/")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<CategoryDto> creatCategory(@Valid @RequestBody CategoryDto categoryDto) {
         CategoryDto categoryDto1 = this.categoryService.createCategory(categoryDto);
         return new ResponseEntity<>(categoryDto1, HttpStatus.CREATED);
     }
 
     @PutMapping("/{categoryId}/")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<CategoryDto> updateCategory(@Valid @RequestBody CategoryDto categoryDto, @PathVariable Integer categoryId) {
         CategoryDto categoryDtos = this.categoryService.updateCategory(categoryDto, categoryId);
         return new ResponseEntity<>(categoryDtos,HttpStatus.OK);
@@ -41,6 +44,7 @@ public class CategoryController {
         return new ResponseEntity<>(categoryDtos,HttpStatus.OK);
     }
     @DeleteMapping("/{categoryId}/")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<CategoryDto> deleteCategory(@PathVariable Integer categoryId) {
         CategoryDto categoryDto = this.categoryService.deleteCategory(categoryId);
         return new ResponseEntity<>(categoryDto,HttpStatus.OK);
